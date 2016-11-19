@@ -1,7 +1,6 @@
 import requests
 import json
-
-AUTH = '?access_token=117f4b6813b4a2deaa24fdc4bc6f9b2fc9bacfa1'
+from token import AUTH
 
 def request_repository(repository):
 	reque = requests.get('https://api.github.com/search/repositories?q='+repository+AUTH)
