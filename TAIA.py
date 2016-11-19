@@ -3,9 +3,11 @@ import json
 from token import AUTH
 
 def request_repository(repository):
-	reque = requests.get('https://api.github.com/search/repositories?q='+repository+AUTH)
+	reque = requests.get('https://api.github.com/search/repositories?q='+repository)
 	if(reque.ok):
 		repoItem = json.loads(reque.text or reque.content)
+		print 'entrou'
+		import pdb;pdb.set_trace()
 		for project in repoItem['items']:
 			print 'repositorio: ' + project['full_name'],'\n'
 			constributors_get = requests.get(project['contributors_url']+AUTH)
@@ -13,6 +15,8 @@ def request_repository(repository):
 			for contributor in constributors:
 				print contributor['login'],contributor['contributions']
 			print '\n'
+	else:
+		print 'fuu'
 		# print "Django repository created: " + repoItem['created_at']
 		
 
