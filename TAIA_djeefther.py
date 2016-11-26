@@ -17,7 +17,7 @@ def request_repository(repository):
 				# 	print contributor['login'],contributor['contributions']
 				# print '\n'
 	else:
-		print 'fuu'
+		print 'ERROR invalid token'
 		# print "Django repository created: " + repoItem['created_at']
 	
 
@@ -40,8 +40,8 @@ def getting_better_contributors(repoItem):
 	return list_sorted[:2]
 
 def repository(owner,repo):
-#	link = 'https://api.github.com/repos/' + owner + '/' + repo + AUTH;
-#	print(link);
+	#link = 'https://api.github.com/repos/' + owner + '/' + repo + AUTH;
+	#print(link);
 	#reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + AUTH)
 	#reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + '/commits' + AUTH)
 	#reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + '/contributors' + AUTH)
@@ -66,7 +66,25 @@ def getGraph(repo_list):
 	for repo in repo_list:
 		reque = requests.get('https://api.github.com/search/repositories?q='+repo)
 
+def explore_repositories(N_iterations,repo_lis=[],user_list=[],max_repo_num = math.inf,max_user_num = math.inf):
+	explored_repositories = {}
+	explored_users = {}
+
+	for i in xrange(0,N_iterations):
+		for i in user_list
+			if not explored_users.__contains__(i):
+				explored_users[i] = None;
+				repo_lis += return_rep(i.owner,i.user);
+
+		for i in repo_lis
+			if not explored_repositories.__contains__(i):
+				explored_repositories[i] = None;
+
+
+	return explored_repositories,explored_users
+
 # getGraph(['tetris'])
 repository('nlohmann','json');
+explore_repositories([],[]);
 # repository = raw_input('Digite o repositorio')
 # request_repository(repository)
