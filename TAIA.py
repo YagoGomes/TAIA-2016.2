@@ -2,6 +2,7 @@
 import requests
 import json
 from token import AUTH
+import math
 
 def request_repository(repository):
 	reque = requests.get('https://api.github.com/search/repositories?q='+repository)
@@ -68,28 +69,28 @@ def return_repo_owner_or_starred_list(user):
 	starred = requests.get('https://api.github.com/users/'+user+'/starred' + AUTH)
 	return json.loads(repo.content), json.loads(starred.content)
 
-def explore_repositories(N_iterations,repo_lis=[],user_list=[],max_repo_num = math.inf,max_user_num = math.inf):
+def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = float("inf"),max_user_num = float("inf")):
 	explored_repositories = {}
 	explored_users = {}
 
 	for it in xrange(0,N_iterations):
-		#Se não tem nem usuarios nem repositorios a explorar, para
-		if not user_list and not repo_lis
+		#Se nao tem nem usuarios nem repositorios a explorar, para
+		if not user_list and not repo_list:
 			break;
 
 		#explorando usuarios
 		for i in user_list:
 			if not explored_users.__contains__(i):
 				explored_users[i] = None;
-				repo_lis += return_repo(i);
+				repo_list += return_repo(i);
 		user_list = [];#todos ja foram explorados
 
 		#explorando repo
-		for i in repo_lis:
+		for i in repo_list:
 			if not explored_repositories.__contains__(i.owner) or not explored_repositories[i.owner].__contains__(i.repo):				
 				explored_repositories[i.owner][i.repo] = None;
 				user_list += return_contri(i.owner,i.repo);
-		repo_lis = []#todos ja foram explorados
+		repo_list = []#todos ja foram explorados
 
 
 	return explored_repositories,explored_users
@@ -99,3 +100,4 @@ def explore_repositories(N_iterations,repo_lis=[],user_list=[],max_repo_num = ma
 # return_repo('nlohmann')
 # repository = raw_input('Digite o repositorio')
 # request_repository(repository)
+return_repo_owner_or_starred_list('djeefther')
