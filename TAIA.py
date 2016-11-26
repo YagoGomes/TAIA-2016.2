@@ -83,12 +83,10 @@ def return_repo_owner_or_starred_list(user):
 	starred = json.loads(requests.get('https://api.github.com/users/'+user+'/starred' + AUTH).content);
 	list = []
 
-	import pdb; pdb.set_trace();
-
 	for i in repo:
-		list.append(Repo(user,i));
+		list.append(Repo(i['owner']['login'],i['name']));
 	for i in starred:
-		list.append(Repo(user,i));
+		list.append(Repo(i['owner']['login'],i['name']));
 
 	return list;
 
