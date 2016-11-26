@@ -40,22 +40,33 @@ def getting_better_contributors(repoItem):
 
 
 def return_contri(owner,repo):
-	#link = 'https://api.github.com/repos/' + owner + '/' + repo + AUTH;
-	#print(link);
+	""" recebe um usuario e um repositorio e retorna os contribuidores desse repositorio """
+#	link = 'https://api.github.com/repos/' + owner + '/' + repo + AUTH;
+#	print(link);
 	#reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + AUTH)
 	#reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + '/commits' + AUTH)
 	#reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + '/contributors' + AUTH)
-	repos = {}
-	contribuidores = []
 	reque = requests.get('https://api.github.com/repos/' + owner + '/' + repo + '/stats/contributors' + AUTH)
 	if reque.ok:
 		repoItem = json.loads(reque.text)
 		sum_weeks(repoItem)
 	return repoItem
 
-def return_repo(user):
+def return_repo_owner(user):
+	""" retorna uma lista de dicionarios dos repositorios do usuario """
 	reque = requests.get('https://api.github.com/users/'+user+'/repos' + AUTH)
 	return json.loads(reque.content)
+
+def return_repo_starred(user):
+	""" retorna uma lista de dicionarios dos repositorios que o usuario deu estrela """
+	reque = requests.get('https://api.github.com/users/'+user+'/starred' + AUTH)
+	return json.loads(reque.content)
+
+def return_repo_owner_or_starred_list(user):
+	""" retorna duas listas de dicionarios. A primeira sao os repositorios do usuario e a segunda a que ele deu estrela """
+	repo = requests.get('https://api.github.com/users/'+user+'/repos' + AUTH)
+	starred = requests.get('https://api.github.com/users/'+user+'/starred' + AUTH)
+	return json.loads(repo.content), json.loads(starred.content)
 
 def explore_repositories(N_iterations,repo_lis=[],user_list=[],max_repo_num = math.inf,max_user_num = math.inf):
 	explored_repositories = {}
