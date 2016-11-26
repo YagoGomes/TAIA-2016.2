@@ -75,12 +75,28 @@ class Repo:
 	def __repr__(self):
 		return self.owner + '/' + self.repo;
 
-		
+count = 0;		
+
+def git_json_request(request):
+	global count
+
+	try:
+		count  += 1;
+		ret_request = requests.get(request+AUTH);
+		return json.loads(ret_request.content);
+	except:
+		print "error at request number ",count,"\n";
+		print "reqyest = ",request,"\n";
+		return {};
+
 
 def return_repo_owner_or_starred_list(user):
 	""" retorna duas listas de dicionarios. A primeira sao os repositorios do usuario e a segunda a que ele deu estrela """
-	repo = json.loads(requests.get('https://api.github.com/users/'+user+'/repos' + AUTH).content);
-	starred = json.loads(requests.get('https://api.github.com/users/'+user+'/starred' + AUTH).content);
+	
+	repo = git_json_request('https://api.github.com/users/'+user+'/repos');
+	starred = git_json_request('https://api.github.com/users/'+user+'/starred');
+
+
 	list = []
 
 	for i in repo:
@@ -91,43 +107,57 @@ def return_repo_owner_or_starred_list(user):
 	return list;
 
 def return_repo_contributors(user,repo):
-	contributors = json.loads(requests.get('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors' + AUTH).content)
+	contributors = git_json_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
 	list_contri = []
 	for contributor in contributors:
 		list_contri.append(contributor['author']['login'])
 	return list_contri
 
 def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = float("inf"),max_user_num = float("inf")):
-	explored_repositories = {}
-	explored_users = {}
+	explored_repositories = set();
+	explored_users = set();
 
 	for it in xrange(0,N_iterations):
+		print 'it=',it;#DEBUG
+
 		#Se nao tem nem usuarios nem repositorios a explorar, para
 		if not user_list and not repo_list:
 			break;
 
-		#explorando usuarios
+
+		print 'len user_list=',len(user_list);#DEBUG
+
+		#explorando usuarios -> repo
 		for i in user_list:
-			if not explored_users.__contains__(i):
-				explored_users[i] = None;
+			if i not in explored_users:
+				explored_users.add(i);
 				
 				if len(explored_users) > max_user_num:
-					return explored_repositories,explored_users 
-				
+					return explored_repositories,explored_users
+
 				repo_list += return_repo_owner_or_starred_list(i);
 
 		user_list = [];#todos ja foram explorados
 
-		#explorando repo
+		print 'len explored_users=',len(explored_users);#DEBUG
+		print 'len repo_list=',len(repo_list);#DEBUG
+
+		#explorando repo -> usuarios
 		for i in repo_list:
-			if not explored_repositories.__contains__(i.__str__())
-				explored_repositories[i.__str__()] = None;
+			#import pdb; pdb.set_trace();
+			if i.__str__() not in explored_repositories:
+				explored_repositories.add(i.__str__());
+				
 				if len(explored_repositories) > max_repo_num:
 					return explored_repositories,explored_users 
 
-				user_list += return_contri(i.owner,i.repo);
+				user_list += return_repo_contributors(i.owner,i.repo);
+		
 		repo_list = []#todos ja foram explorados
 
+		print 'len explored_repositories=',len(explored_repositories),'\n';#DEBUG
+
+		#raw_input('wait');#DEBUG
 
 	return explored_repositories,explored_users
 
@@ -136,4 +166,12 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 # return_repo('nlohmann')
 # repository = raw_input('Digite o repositorio')
 # request_repository(repository)
-return_repo_contributors('nlohmann','json')
+try:
+	repo,user = explore_repositories(10,[Repo('nlohmann','json')],[]);
+except:
+	import pdb;pdb.set_trace();
+
+print '\n\n';
+print "repo",repo;
+print "user",user;
+
