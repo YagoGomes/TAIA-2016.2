@@ -105,13 +105,21 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 		for i in user_list:
 			if not explored_users.__contains__(i):
 				explored_users[i] = None;
-				repo_list += return_repo(i);
+				
+				if len(explored_users) > max_user_num:
+					return explored_repositories,explored_users 
+				
+				repo_list += return_repo_owner_or_starred_list(i);
+
 		user_list = [];#todos ja foram explorados
 
 		#explorando repo
 		for i in repo_list:
-			if not explored_repositories.__contains__(i.owner) or not explored_repositories[i.owner].__contains__(i.repo):				
-				explored_repositories[i.owner][i.repo] = None;
+			if not explored_repositories.__contains__(i.__str__())
+				explored_repositories[i.__str__()] = None;
+				if len(explored_repositories) > max_repo_num:
+					return explored_repositories,explored_users 
+
 				user_list += return_contri(i.owner,i.repo);
 		repo_list = []#todos ja foram explorados
 
