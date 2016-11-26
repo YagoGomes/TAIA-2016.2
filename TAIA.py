@@ -83,14 +83,19 @@ def return_repo_owner_or_starred_list(user):
 	starred = json.loads(requests.get('https://api.github.com/users/'+user+'/starred' + AUTH).content);
 	list = []
 
-	import pdb; pdb.set_trace();
-
 	for i in repo:
-		list.append(Repo(user,i));
+		list.append(Repo(i['owner']['login'],i['name']));
 	for i in starred:
-		list.append(Repo(user,i));
+		list.append(Repo(i['owner']['login'],i['name']));
 
 	return list;
+
+def return_repo_contributors(user,repo):
+	contributors = json.loads(requests.get('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors' + AUTH).content)
+	list_contri = []
+	for contributor in contributors:
+		list_contri.append(contributor['author']['login'])
+	return list_contri
 
 def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = float("inf"),max_user_num = float("inf")):
 	explored_repositories = {}
@@ -131,4 +136,4 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 # return_repo('nlohmann')
 # repository = raw_input('Digite o repositorio')
 # request_repository(repository)
-print(return_repo_owner_or_starred_list('djeefther'))
+return_repo_contributors('nlohmann','json')
