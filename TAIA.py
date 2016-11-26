@@ -63,11 +63,34 @@ def return_repo_starred(user):
 	reque = requests.get('https://api.github.com/users/'+user+'/starred' + AUTH)
 	return json.loads(reque.content)
 
+class Repo:
+	def __init__(self):
+		self.owner = "";
+		self.repo = "";
+	def __init__(self,owner,repo):
+		self.owner = owner;
+		self.repo = repo;
+	def __str__(self):
+		return self.owner + '/' + self.repo;
+	def __repr__(self):
+		return self.owner + '/' + self.repo;
+
+		
+
 def return_repo_owner_or_starred_list(user):
 	""" retorna duas listas de dicionarios. A primeira sao os repositorios do usuario e a segunda a que ele deu estrela """
-	repo = requests.get('https://api.github.com/users/'+user+'/repos' + AUTH)
-	starred = requests.get('https://api.github.com/users/'+user+'/starred' + AUTH)
-	return json.loads(repo.content), json.loads(starred.content)
+	repo = json.loads(requests.get('https://api.github.com/users/'+user+'/repos' + AUTH).content);
+	starred = json.loads(requests.get('https://api.github.com/users/'+user+'/starred' + AUTH).content);
+	list = []
+
+	import pdb; pdb.set_trace();
+
+	for i in repo:
+		list.append(Repo(user,i));
+	for i in starred:
+		list.append(Repo(user,i));
+
+	return list;
 
 def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = float("inf"),max_user_num = float("inf")):
 	explored_repositories = {}
@@ -100,4 +123,4 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 # return_repo('nlohmann')
 # repository = raw_input('Digite o repositorio')
 # request_repository(repository)
-return_repo_owner_or_starred_list('djeefther')
+print(return_repo_owner_or_starred_list('djeefther'))
