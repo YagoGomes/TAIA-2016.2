@@ -25,13 +25,14 @@ def request_repository(repository):
 
 def sum_weeks(repoItem_list_contr):
 	for contri in repoItem_list_contr:
-		acc_weeks = {"a":0,"c":0,"d":0}
-		weeks = contri["weeks"]
-		for w in weeks:
-			acc_weeks["a"] += w["a"]
-			acc_weeks["c"] += w["c"]
-			acc_weeks["d"] += w["d"]
-		contri["weeks"] = acc_weeks;
+		if type(contri) == type({}):
+			acc_weeks = {"a":0,"c":0,"d":0}
+			weeks = contri["weeks"]
+			for w in weeks:
+				acc_weeks["a"] += w["a"]
+				acc_weeks["c"] += w["c"]
+				acc_weeks["d"] += w["d"]
+			contri["weeks"] = acc_weeks
 	return 	repoItem_list_contr;
 
 def getting_better_contributors(repoItem):
@@ -173,11 +174,13 @@ def return_repo_owner_or_starred_list(user):
 def return_repo_contributors(user,repo):
 	contributors = git_json_cached_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
 	list_contri = []
-	for contributor in contributors:
-		if contributor.__contains__('author'):
-			if type(contributor['author']) == type({}) and contributor['author'].__contains__('login'):
-				list_contri.append(contributor['author']['login'])
-	return list_contri
+	if type(contributors) == type([]):
+		for contributor in contributors:
+			if contributor.__contains__('author'):
+				if type(contributor['author']) == type({}) and contributor['author'].__contains__('login'):
+					list_contri.append(contributor['author']['login'])
+		return list_contri
+	return []
 
 def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = float("inf"),max_user_num = float("inf")):
 	explored_repositories = set();
