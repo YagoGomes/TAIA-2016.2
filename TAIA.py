@@ -163,7 +163,9 @@ def return_repo_contributors(user,repo):
 	contributors = git_json_cached_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
 	list_contri = []
 	for contributor in contributors:
-		list_contri.append(contributor['author']['login'])
+		if contributor.__contains__('author'):
+			if type(contributor['author']) == type({}) and contributor['author'].__contains__('login'):
+				list_contri.append(contributor['author']['login'])
 	return list_contri
 
 def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = float("inf"),max_user_num = float("inf")):
