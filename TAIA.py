@@ -92,7 +92,15 @@ def git_json_request(request):
 		print "request = ",request,"\n";
 		return {};
 
+
+cache_count = 0;
+cache_not_count = 0;
+
+
 def git_json_cached_request(request):
+	global cache_count;
+	global cache_not_count;
+
 	directory  = 'cache';
 
 	#garantidno que a pasta cache exist
@@ -114,12 +122,15 @@ def git_json_cached_request(request):
 
    		try :
    			json_file_request = open(json_file_path_request,'r');
+   			#print 'cache'
    			return json.load(json_file_request);
    		except:
    			json_file_request = None;
    			del index[request];
 
    	#get (Se else nao tem no dicionario, ou se tem mas nao abre o arquivo)
+	print 'not cached'
+	pdb.set_trace();
 	dict_request = git_json_request(request);
 
 	if not dict_request:
@@ -224,7 +235,14 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 #import pdb; pdb.run("explore_repositories(10,[Repo('nlohmann','json')],[]);");
 
 try:
-	repo,user = explore_repositories(10,[Repo('nlohmann','json')],[]);
+	repo,user = explore_repositories(3,[Repo('nlohmann','json')],[],100,1000);
+	
+	with open('repo.json','w') as f:
+		json.dump(repo,f);
+
+	with open('user.json') as f:
+		json.dump(user,f);
+
 except:
 	import pdb;
 	type, value, tb = sys.exc_info()
