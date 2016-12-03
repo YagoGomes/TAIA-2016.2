@@ -99,14 +99,14 @@ cache_not_count = 0;
 cache_last = None;
 last_print = 0;
 
-def git_json_cached_request_stauts(cache):
+def git_json_cached_request_stauts(cache,print_=True):
 	global cache_count;
 	global cache_not_count;
 	global cache_last;
 	global total_count;
 	global last_print;
 
-	if cache != 'print':
+	if type(cache) == type(True):
 		cache_last = cache;
 		total_count = total_count + 1;
 		if cache:
@@ -114,18 +114,19 @@ def git_json_cached_request_stauts(cache):
 		else:
 			cache_not_count = cache_not_count + 1;
 
-	if cache != cache_last or cache == 'print' or (last_print + 100) > total_count:
+	if cache != cache_last or cache == 'print' or (last_print + 100) < total_count:
 		last_print = total_count;
 		
-		print '\n---'
-		if cache:
-			print 'cached'
-		else:
-			print 'not cached'
-		print 'total_count = ', total_count
-		print 'cache_not_count = ', cache_not_count
-		print 'cache_count = ', cache_count
-		print '---\n'
+		if print_ or cache == 'print':
+			print '\n---'
+			if cache:
+				print 'cached'
+			else:
+				print 'not cached'
+			print 'total_count = ', total_count
+			print 'cache_not_count = ', cache_not_count
+			print 'cache_count = ', cache_count
+			print '---\n'
 
 def git_json_cached_request(request):
 
@@ -229,7 +230,7 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 				explored_users.add(i);
 				
 				if len(explored_users) > max_user_num:
-					return explored_repositories,explored_users
+					break;
 
 				repo_list += return_repo_owner_or_starred_list(i);
 
@@ -245,7 +246,7 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 				explored_repositories.add(i.__str__());
 				
 				if len(explored_repositories) > max_repo_num:
-					return explored_repositories,explored_users 
+					break;
 
 				user_list += return_repo_contributors(i.owner,i.repo);
 		
@@ -268,10 +269,10 @@ try:
 	repo,user = explore_repositories(3,[Repo('nlohmann','json')],[],100,1000);
 	
 	with open('repo.json','w') as f:
-		json.dump(list(repo),f);
+		json.dump(list(repo),f,indent=4);
 
 	with open('user.json','w') as f:
-		json.dump(list(user),f);
+		json.dump(list(user),f,indent=4);
 
 except:
 	import pdb;
