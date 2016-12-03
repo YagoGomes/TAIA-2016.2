@@ -146,7 +146,7 @@ def git_json_cached_request(request):
 		index = {'count':0};
 		
 	#achando o request (get/cache)
-   	if index.__contains__(request) : #cache
+   	if request in index: #cache
    		json_file_path_request = index[request];
 
    		try :
@@ -163,7 +163,9 @@ def git_json_cached_request(request):
 
 	if not dict_request:
 		return dict_request;#se retornou vazio, nao salva no cache!
-
+	
+	if 'contributors' in request:
+		dict_request = sum_weeks(dict_request)
 	#dando nome ao novo request
 	next_id = index['count'];
 	index['count'] = next_id + 1;
@@ -256,13 +258,7 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 		#raw_input('wait');#DEBUG
 
 	return explored_repositories,explored_users
-# getGraph(['tetris'])
-# repository('nlohmann','json');
-# return_repo('nlohmann')
-# repository = raw_input('Digite o repositorio')
-# request_repository(repository)
 
-#import pdb; pdb.run("explore_repositories(10,[Repo('nlohmann','json')],[]);");
 
 try:
 	repo,user = explore_repositories(3,[Repo('nlohmann','json')],[],100,1000);
@@ -272,9 +268,8 @@ try:
 
 	with open('user.json','w') as f:
 		json.dump(list(user),f);
-
 except:
-	import pdb;
+	pass
 	type, value, tb = sys.exc_info()
 	traceback.print_exc()
 	pdb.post_mortem(tb)
