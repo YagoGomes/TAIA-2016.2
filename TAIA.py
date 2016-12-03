@@ -93,14 +93,42 @@ def git_json_request(request):
 		print "request = ",request,"\n";
 		return {};
 
-
+total_count = 0;
 cache_count = 0;
 cache_not_count = 0;
+cache_last = None;
+last_print = 0;
 
-
-def git_json_cached_request(request):
+def git_json_cached_request_stauts(cache):
 	global cache_count;
 	global cache_not_count;
+	global cache_last;
+	global total_count;
+	global last_print;
+
+	if cache != 'print':
+		cache_last = cache;
+		total_count = total_count + 1;
+		if cache:
+			cache_count = cache_count + 1;
+		else:
+			cache_not_count = cache_not_count + 1;
+
+	if cache != cache_last or cache == 'print' or (last_print + 100) > total_count:
+		last_print = total_count;
+		
+		print '\n---'
+		if cache:
+			print 'cached'
+		else:
+			print 'not cached'
+		print 'total_count = ', total_count
+		print 'cache_not_count = ', cache_not_count
+		print 'cache_count = ', cache_count
+		print '---\n'
+
+def git_json_cached_request(request):
+
 
 	directory  = 'cache';
 
@@ -123,15 +151,14 @@ def git_json_cached_request(request):
 
    		try :
    			json_file_request = open(json_file_path_request,'r');
-   			#print 'cache'
+   			git_json_cached_request_stauts(True);
    			return json.load(json_file_request);
    		except:
    			json_file_request = None;
    			del index[request];
 
    	#get (Se else nao tem no dicionario, ou se tem mas nao abre o arquivo)
-	print 'not cached'
-	pdb.set_trace();
+	git_json_cached_request_stauts(False);
 	dict_request = git_json_request(request);
 
 	if not dict_request:
@@ -241,10 +268,10 @@ try:
 	repo,user = explore_repositories(3,[Repo('nlohmann','json')],[],100,1000);
 	
 	with open('repo.json','w') as f:
-		json.dump(repo,f);
+		json.dump(list(repo),f);
 
-	with open('user.json') as f:
-		json.dump(user,f);
+	with open('user.json','w') as f:
+		json.dump(list(user),f);
 
 except:
 	import pdb;
@@ -256,3 +283,4 @@ except:
 print '\n\n';
 print "repo",repo;
 print "user",user;
+git_json_cached_request_stauts('print');
