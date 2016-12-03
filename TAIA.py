@@ -3,6 +3,8 @@ import requests
 import json
 from token import AUTH
 import math
+import os
+import pdb, traceback, sys
 
 def request_repository(repository):
 	reque = requests.get('https://api.github.com/search/repositories?q='+repository)
@@ -79,6 +81,7 @@ count = 0;
 
 def git_json_request(request):
 	global count
+	#print(request);
 
 	try:
 		count  += 1;
@@ -86,15 +89,65 @@ def git_json_request(request):
 		return json.loads(ret_request.content);
 	except:
 		print "error at request number ",count,"\n";
-		print "reqyest = ",request,"\n";
+		print "request = ",request,"\n";
 		return {};
+
+def git_json_cached_request(request):
+	directory  = 'cache';
+
+	#garantidno que a pasta cache exist
+	if not os.path.exists(directory):
+	    os.makedirs(directory);
+
+	#abrindo index de cache
+	try:
+		f_index = open(directory + '/index.json','r');
+		index = json.load(f_index);
+   		f_index.close();
+	except:
+		f_index = None;
+		index = {'count':0};
+		
+	#achando o request (get/cache)
+   	if index.__contains__(request) : #cache
+   		json_file_path_request = index[request];
+
+   		try :
+   			json_file_request = open(json_file_path_request,'r');
+   			return json.load(json_file_request);
+   		except:
+   			json_file_request = None;
+   			del index[request];
+
+   	#get (Se else nao tem no dicionario, ou se tem mas nao abre o arquivo)
+	dict_request = git_json_request(request);
+
+	if not dict_request:
+		return dict_request;#se retornou vazio, nao salva no cache!
+
+	#dando nome ao novo request
+	next_id = index['count'];
+	index['count'] = next_id + 1;
+	file_name = directory + '/' + str(next_id) + '.json';
+
+	#salvando ele na pasta
+	f_dict_request = open(file_name,'w');
+	json.dump(dict_request,f_dict_request);
+	f_dict_request.close();
+
+	#adicionando no index e salvando na pasta
+	index[request] = file_name;
+	f_index = open(directory + '/index.json','w');
+	json.dump(index,f_index);
+
+	return dict_request;
 
 
 def return_repo_owner_or_starred_list(user):
 	""" retorna duas listas de dicionarios. A primeira sao os repositorios do usuario e a segunda a que ele deu estrela """
 	
-	repo = git_json_request('https://api.github.com/users/'+user+'/repos');
-	starred = git_json_request('https://api.github.com/users/'+user+'/starred');
+	repo = git_json_cached_request('https://api.github.com/users/'+user+'/repos');
+	starred = git_json_cached_request('https://api.github.com/users/'+user+'/starred');
 
 
 	list = []
@@ -107,7 +160,7 @@ def return_repo_owner_or_starred_list(user):
 	return list;
 
 def return_repo_contributors(user,repo):
-	contributors = git_json_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
+	contributors = git_json_cached_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
 	list_contri = []
 	for contributor in contributors:
 		list_contri.append(contributor['author']['login'])
@@ -160,18 +213,23 @@ def explore_repositories(N_iterations,repo_list=[],user_list=[],max_repo_num = f
 		#raw_input('wait');#DEBUG
 
 	return explored_repositories,explored_users
-
 # getGraph(['tetris'])
 # repository('nlohmann','json');
 # return_repo('nlohmann')
 # repository = raw_input('Digite o repositorio')
 # request_repository(repository)
+
+#import pdb; pdb.run("explore_repositories(10,[Repo('nlohmann','json')],[]);");
+
 try:
 	repo,user = explore_repositories(10,[Repo('nlohmann','json')],[]);
 except:
-	import pdb;pdb.set_trace();
+	import pdb;
+	type, value, tb = sys.exc_info()
+	traceback.print_exc()
+	pdb.post_mortem(tb)
+
 
 print '\n\n';
 print "repo",repo;
 print "user",user;
-
