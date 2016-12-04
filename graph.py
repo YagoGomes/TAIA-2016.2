@@ -1,7 +1,19 @@
 import os
 import json
 import networkx as nx
+import operator
 
+
+def most_important_contributors(graph_list):
+	contributors = {}
+
+	for key,contributor,contributions in graph_list:
+		if contributor not in contributors:
+			contributors[contributor] = contributions
+		else:
+			contributors[contributor] += contributions
+
+	return contributors, contributor
 
 def create_format_graph(index):
 
@@ -60,6 +72,8 @@ graph_list = []
 for key,lista in graph_dict.iteritems():
 	for contributor,contributions in lista:
 		graph_list.append((key,contributor,contributions))
+
+contributors, contributor = most_important_contributors(graph_list)
 
 B = nx.Graph()
 B.add_weighted_edges_from(graph_list)
