@@ -165,8 +165,8 @@ def git_json_cached_request(request):
 	if not dict_request:
 		return dict_request;#se retornou vazio, nao salva no cache!
 	
-	if 'contributors' in request:
-		dict_request = sum_weeks(dict_request)
+	# if 'contributors' in request:
+	# 	dict_request = sum_weeks(dict_request)
 	#dando nome ao novo request
 	next_id = index['count'];
 	index['count'] = next_id + 1;
@@ -185,7 +185,7 @@ def git_json_cached_request(request):
 	return dict_request;
 
 
-def return_repo_owner_or_starred_list(user):
+def return_repo_owner_or_starred_list_antiga(user):
 	""" retorna duas listas de dicionarios. A primeira sao os repositorios do usuario e a segunda a que ele deu estrela """
 	
 	repo = git_json_cached_request('https://api.github.com/users/'+user+'/repos');
@@ -201,7 +201,7 @@ def return_repo_owner_or_starred_list(user):
 
 	return list;
 
-def return_repo_contributors(user,repo):
+def return_repo_contributors_antiga(user,repo):
 	contributors = git_json_cached_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
 	list_contri = []
 	if type(contributors) == type([]):
@@ -209,6 +209,39 @@ def return_repo_contributors(user,repo):
 			if contributor.__contains__('author'):
 				if type(contributor['author']) == type({}) and contributor['author'].__contains__('login'):
 					list_contri.append(contributor['author']['login'])
+		return list_contri
+	return []
+
+def return_repo_owner_or_starred_list(user):
+	""" retorna duas listas de dicionarios. A primeira sao os repositorios do usuario e a segunda a que ele deu estrela """
+	
+	repo = git_json_cached_request('https://api.github.com/users/'+user+'/repos');
+	# starred = git_json_cached_request('https://api.github.com/users/'+user+'/starred');
+
+
+	list = []
+
+	for i in repo:
+		list.append(Repo(i['owner']['login'],i['name']));
+	# for i in starred:
+	# 	list.append(Repo(i['owner']['login'],i['name']));
+
+	return list;
+
+def return_repo_contributors(user,repo):
+	# contributors = git_json_cached_request('https://api.github.com/repos/' + user + '/' + repo + '/stats/contributors');
+	contributors = git_json_cached_request('https://api.github.com/repos/' + user + '/' + repo + '/contributors');
+	list_contri = []
+	if type(contributors) == type([]):
+		# print 'entrou if1'
+		for contributor in contributors:
+			# print 'for'
+			list_contri.append(contributor['login'])
+			# if contributor.__contains__('author'):
+			# 	print 'entrou if2'
+			# 	if type(contributor['author']) == type({}) and contributor['author'].__contains__('login'):
+			# 		print 'entrou if3'
+			# 		list_contri.append(contributor['author']['login'])
 		return list_contri
 	return []
 
