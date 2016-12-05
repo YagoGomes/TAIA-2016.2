@@ -86,8 +86,10 @@ contributor_by_contributions, contributor_by_edge = most_important_contributors(
 
 B = nx.Graph()
 B.add_weighted_edges_from(graph_list)
-color = bipartite.color(B)
-nx.set_node_attributes(B,'bipartite',color)
-nx.draw(B, with_labels = True)
+X, Y = bipartite.sets(B)
+pos = dict()
+pos.update( (n, (1, i)) for i, n in enumerate(X) ) # put nodes from X at x=1
+pos.update( (n, (2, i)) for i, n in enumerate(Y) ) # put nodes from Y at x=2
+nx.draw(B, pos=pos, with_labels = True)
 plt.show()
 # import pdb;pdb.set_trace()
