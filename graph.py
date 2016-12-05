@@ -5,15 +5,22 @@ import operator
 
 
 def most_important_contributors(graph_list):
-	contributors = {}
+	contributors_by_contributions = {}
+	contributors_by_edge = {}
 
 	for key,contributor,contributions in graph_list:
-		if contributor not in contributors:
-			contributors[contributor] = contributions
+		if contributor not in contributors_by_contributions:
+			contributors_by_contributions[contributor] = contributions
 		else:
-			contributors[contributor] += contributions
+			contributors_by_contributions[contributor] += contributions
 
-	return contributors, contributor
+		if contributor not in contributors_by_edge:
+			contributors_by_edge[contributor] = 1
+		else:
+			contributors_by_edge[contributor] += 1
+
+	return max(contributors_by_contributions.iteritems(), key=operator.itemgetter(1))[0], max(contributors_by_edge.iteritems(), key=operator.itemgetter(1))[0]
+	
 
 def create_format_graph(index):
 
@@ -73,8 +80,8 @@ for key,lista in graph_dict.iteritems():
 	for contributor,contributions in lista:
 		graph_list.append((key,contributor,contributions))
 
-contributors, contributor = most_important_contributors(graph_list)
+contributor_by_contributions, contributor_by_edge = most_important_contributors(graph_list)
 
-B = nx.Graph()
-B.add_weighted_edges_from(graph_list)
+# B = nx.Graph()
+# B.add_weighted_edges_from(graph_list)
 import pdb;pdb.set_trace()
