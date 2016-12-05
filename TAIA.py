@@ -301,12 +301,7 @@ try:
 		json.dump(list(repo),f,indent=4);
 
 	with open('user.json','w') as f:
-<<<<<<< HEAD
 		json.dump(list(user),f,indent=4);
-
-=======
-		json.dump(list(user),f);
->>>>>>> 6c74c44464457444b7e69aadd1ca1954eff7e6ab
 except:
 	pass
 	type, value, tb = sys.exc_info()

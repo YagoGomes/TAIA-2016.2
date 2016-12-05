@@ -1,7 +1,9 @@
 import os
 import json
 import networkx as nx
+from networkx.algorithms import bipartite
 import operator
+import matplotlib.pyplot as plt
 
 
 def most_important_contributors(graph_list):
@@ -82,6 +84,10 @@ for key,lista in graph_dict.iteritems():
 
 contributor_by_contributions, contributor_by_edge = most_important_contributors(graph_list)
 
-# B = nx.Graph()
-# B.add_weighted_edges_from(graph_list)
-import pdb;pdb.set_trace()
+B = nx.Graph()
+B.add_weighted_edges_from(graph_list)
+color = bipartite.color(B)
+nx.set_node_attributes(B,'bipartite',color)
+nx.draw(B, with_labels = True)
+plt.show()
+# import pdb;pdb.set_trace()
