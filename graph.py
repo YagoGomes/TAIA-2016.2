@@ -67,29 +67,43 @@ def create_format_graph(index):
 
 
 
-def link_prediction(graph_dict,graph,repo):
-	users = []
-	for tupla in graph_dict[repo]:
-		users.append(tupla[0])
+def link_prediction(graph_dict):
+	
 
 	repos = []
 	for key in graph_dict:
-		if key != repo:
-			repos.append(key)
+		repos.append(key)
 
-	maybe_contri = []
-	contri_list = []
-	for repo_p in repos:
-		for user in users:
-			for contri,cont in graph_dict[repo_p]:
-				if contri == user:
-					user_stats = max(graph_dict[repo_p],key=operator.itemgetter(1))
-					if user_stats[0] not in maybe_contri and user_stats[0] != user:
-						maybe_contri.append(user_stats[0])
-						contri_list.append(user_stats[1])
+	link_prediction_repos = {}
 
+	for repo in repos:
+		maybe_contri = []
+		contri_list = []
 
-	import pdb;pdb.set_trace()
+		users = []
+		for tupla in graph_dict[repo]:
+			users.append(tupla[0])
+		for repo_p in repos:
+			if repo != repo_p:
+				for contri,cont in graph_dict[repo_p]:
+					if contri in users:
+						user_stats = sorted(graph_dict[repo_p],key=operator.itemgetter(1),reverse=True)
+						for user_contri,contribu in user_stats:
+							if user_contri not in users:
+								if user_contri in maybe_contri:
+									contri_list[maybe_contri.index(user_contri)] += contribu
+								else:
+									maybe_contri.append(user_contri)
+									contri_list.append(contribu) 
+								break
+		tuple_list = []
+		for index, contri in enumerate(maybe_contri):
+			tuple_list.append((contri, contri_list[index]))
+		if tuple_list:
+			link_prediction_repos[repo] = sorted(tuple_list,key=operator.itemgetter(1),reverse=True)[0]
+
+	return link_prediction_repos	
+	
 
 directory  = 'cache';
 
@@ -112,11 +126,11 @@ print "Contribuidor por contribuicao: " + contributor_by_contributions
 print "Contribuiu para mais projetos: " + contributor_by_edge
 B = nx.Graph()
 B.add_weighted_edges_from(graph_list)
-link_prediction(graph_dict,graph_list,'https://api.github.com/repos/nlohmann/json')
+link_prediction_repo = link_prediction(graph_dict)
+# import pdb;pdb.set_trace()
 X, Y = bipartite.sets(B)
 pos = dict()
 pos.update( (n, (1, i)) for i, n in enumerate(X) ) # put nodes from X at x=1
 pos.update( (n, (2, i)) for i, n in enumerate(Y) ) # put nodes from Y at x=2
 nx.draw(B, pos=pos, with_labels = True)
 plt.show()
-# import pdb;pdb.set_trace()
