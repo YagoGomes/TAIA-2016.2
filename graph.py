@@ -79,7 +79,7 @@ def link_prediction(graph_dict):
 	for repo in repos:
 		maybe_contri = []
 		contri_list = []
-
+		owner = repo.split('/')[4]
 		users = []
 		for tupla in graph_dict[repo]:
 			users.append(tupla[0])
@@ -89,7 +89,7 @@ def link_prediction(graph_dict):
 					if contri in users:
 						user_stats = sorted(graph_dict[repo_p],key=operator.itemgetter(1),reverse=True)
 						for user_contri,contribu in user_stats:
-							if user_contri not in users:
+							if user_contri not in users and user_contri != owner:
 								if user_contri in maybe_contri:
 									contri_list[maybe_contri.index(user_contri)] += contribu
 								else:
@@ -101,6 +101,7 @@ def link_prediction(graph_dict):
 			tuple_list.append((contri, contri_list[index]))
 		if tuple_list:
 			link_prediction_repos[repo] = sorted(tuple_list,key=operator.itemgetter(1),reverse=True)[0]
+			print 'repo: ',repo,' user: ', link_prediction_repos[repo][0],' contribuicao: ', link_prediction_repos[repo][1]
 
 	return link_prediction_repos	
 	
